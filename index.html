@@ -317,22 +317,25 @@ async function predict(){
         }
     }
 
-    // 가중치 계산 (UP: 0.8 / NONE: 0.8 / DOWN: 1.0)
+    
     let weightedUp = upProb;
     let weightedNone = noneProb;
     let weightedDown = downProb; 
-
+    
     let realMaxProb = Math.max(weightedUp, weightedDown, weightedNone);
-    document.getElementById("confidence").innerHTML = (realMaxProb * 100).toFixed(1) + "%";
+
+// 수치 부분에만 클래스(confidence-num)를 부여하여 innerHTML에 삽입
+    const formattedProb = (realMaxProb * 100).toFixed(1);
+    document.getElementById("confidence").innerHTML = `<span class="confidence-num">${formattedProb}</span>%`;
 
     // 엄격한 조건 검증 (0.7 초과 및 편차 0.2 이상)
-    if (weightedUp > 0.7 && (weightedUp - weightedDown > 0.2)) {
+    if (weightedUp > 0.95 && (weightedUp - weightedDown > 0.2)) {
         updateState("UP");
     }
     else if (weightedDown > 0.5 && (weightedDown - weightedUp > 0.0)) {
         updateState("DOWN");
     }
-    else if (weightedNone > 0.7) {
+    else if (weightedNone > 0.5) {
         updateState("NONE");
     }
     else {
