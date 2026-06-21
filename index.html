@@ -318,8 +318,8 @@ async function predict(){
     }
 
     // 가중치 계산 (UP: 0.4 / NONE: 0.6 / DOWN: 1.0)
-    let weightedUp = upProb * 0.4;
-    let weightedNone = noneProb * 0.6;
+    let weightedUp = upProb * 0.8;
+    let weightedNone = noneProb * 0.8;
     let weightedDown = downProb; 
 
     let realMaxProb = Math.max(weightedUp, weightedDown, weightedNone);
