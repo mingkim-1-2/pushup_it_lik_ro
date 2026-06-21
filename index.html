@@ -317,10 +317,10 @@ async function predict(){
         }
     }
 
-    // 가중치 계산 (UP: 0.4 / NONE: 0.6 / DOWN: 1.0)
+    // 가중치 계산 (UP: 0.8 / NONE: 0.8 / DOWN: 1.0)
     let weightedUp = upProb * 0.8;
     let weightedNone = noneProb * 0.8;
-    let weightedDown = downProb; 
+    let weightedDown = downProb * 5.0; 
 
     let realMaxProb = Math.max(weightedUp, weightedDown, weightedNone);
     document.getElementById("confidence").innerHTML = (realMaxProb * 100).toFixed(1) + "%";
