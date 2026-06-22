@@ -322,7 +322,7 @@ async function predict(){
     
     let weightedUp = upProb;
     let weightedNone = noneProb;
-    let weightedDown = downProb*5; 
+    let weightedDown = downProb; 
     
     let realMaxProb = Math.max(weightedUp, weightedDown, weightedNone);
 
@@ -331,13 +331,13 @@ async function predict(){
     document.getElementById("confidence").innerHTML = `<span class="confidence-num">${formattedProb}</span>%`;
 
     // 엄격한 조건 검증 (0.7 초과 및 편차 0.2 이상)
-    if (weightedUp > 0.95 && (weightedUp - weightedDown > 0.2)) {
+    if (weightedUp > 0.7 && (weightedUp - weightedDown > 0.2)) {
         updateState("UP");
     }
-    else if (weightedDown > 0.5 && (weightedDown - weightedUp > 0.0)) {
+    else if (weightedDown > 0.7 && (weightedDown - weightedUp > 0.2)) {
         updateState("DOWN");
     }
-    else if (weightedNone > 0.5) {
+    else if (weightedNone > 0.7) {
         updateState("NONE");
     }
     else {
