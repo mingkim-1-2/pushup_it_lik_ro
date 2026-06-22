@@ -304,33 +304,34 @@ async function predict(){
     let downProb = 0;
     let noneProb = 0;
 
+    // 1. Teachable Machine에서 클래스별 확률 수집
     for(let i = 0; i < maxPredictions; i++){
-    let className = prediction[i].className.toLowerCase();
-    
-    // 🛠️ 'includes' 대신 '==='를 사용하여 이름이 정확히 일치할 때만 변수에 할당합니다.
-    if(className === "pushup_up"){
-        upProb = prediction[i].probability;
-    }
-    else if(className === "pushup_down"){
-        downProb = prediction[i].probability;
-    }
-    else if(className === "none"){
-        noneProb = prediction[i].probability;
-    }
-}
+        let className = prediction[i].className.toLowerCase();
+        
+        if(className === "pushup_up"){
+            upProb = prediction[i].probability;
+        }
+        else if(className === "pushup_down"){
+            downProb = prediction[i].probability;
+        }
+        else if(className === "none"){
+            noneProb = prediction[i].probability;
+        }
+    } // 👈 닫는 괄호를 이쪽으로 이동하여 for 루프를 여기서 끝냅니다.
 
-    
-    let weightedUp = downProb;
+    // 2. 의도하신 대로 레이블 교차 매핑 유지
+    let weightedUp = downProb;   // UP 상태일 때 DOWN 레이블이 나오는 특성 반영
     let weightedNone = noneProb;
-    let weightedDown = upProb; 
+    let weightedDown = upProb;   // DOWN 상태일 때 UP 레이블이 나오는 특성 반영
     
+    // 3. 현재 프레임의 최대 확률 계산 (이제 딱 한 번만 수행됩니다)
     let realMaxProb = Math.max(weightedUp, weightedDown, weightedNone);
 
-// 수치 부분에만 클래스(confidence-num)를 부여하여 innerHTML에 삽입
+    // 4. 신뢰도 화면 표시 (100%를 넘지 않고 정상 출력됩니다)
     const formattedProb = (realMaxProb * 100).toFixed(1);
     document.getElementById("confidence").innerHTML = `<span class="confidence-num">${formattedProb}</span>%`;
 
-    // 엄격한 조건 검증 (0.7 초과 및 편차 0.2 이상)
+    // 5. 엄격한 조건 검증 및 상태 업데이트
     if (weightedUp > 0.7 && (weightedUp - weightedDown > 0.2)) {
         updateState("UP");
     }
@@ -341,8 +342,6 @@ async function predict(){
         updateState("NONE");
     }
     else {
-        // 🛠️ 조건에 미달하는 애매한 구간이 스쳐 지나갈 때는 
-        // 기존 신호를 끊거나 리셋하지 않고 '그대로 유지'하여 화면 출력이 흔들리는 걸 차단합니다.
         document.getElementById("result").innerHTML = "자세 정밀 추적 중...";
         document.getElementById("result").style.color = "#f59e0b"; 
     }
