@@ -320,9 +320,9 @@ async function predict(){
 }
 
     
-    let weightedUp = upProb;
+    let weightedUp = downProb;
     let weightedNone = noneProb;
-    let weightedDown = downProb; 
+    let weightedDown = upProb; 
     
     let realMaxProb = Math.max(weightedUp, weightedDown, weightedNone);
 
