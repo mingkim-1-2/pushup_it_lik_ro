@@ -305,17 +305,19 @@ async function predict(){
     let noneProb = 0;
 
     for(let i = 0; i < maxPredictions; i++){
-        let className = prediction[i].className.toLowerCase();
-        if(className.includes("up")){
-            upProb = prediction[i].probability;
-        }
-        else if(className.includes("down")){
-            downProb = prediction[i].probability;
-        }
-        else if(className.includes("none")){
-            noneProb = prediction[i].probability;
-        }
+    let className = prediction[i].className.toLowerCase();
+    
+    // 🛠️ 'includes' 대신 '==='를 사용하여 이름이 정확히 일치할 때만 변수에 할당합니다.
+    if(className === "pushup_up"){
+        upProb = prediction[i].probability;
     }
+    else if(className === "pushup_down"){
+        downProb = prediction[i].probability;
+    }
+    else if(className === "none"){
+        noneProb = prediction[i].probability;
+    }
+}
 
     
     let weightedUp = upProb;
