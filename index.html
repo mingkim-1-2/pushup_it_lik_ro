@@ -338,7 +338,7 @@ async function predict(){
     else if (weightedDown > 0.7 && (weightedDown - weightedUp > 0.2)) {
         updateState("DOWN");
     }
-    else if (weightedNone > 0.7) {
+    else if (weightedNone > 0.4) {
         updateState("NONE");
     }
     else {
