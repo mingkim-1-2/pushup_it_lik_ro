@@ -320,9 +320,9 @@ async function predict(){
     } // 👈 닫는 괄호를 이쪽으로 이동하여 for 루프를 여기서 끝냅니다.
 
     // 2. 의도하신 대로 레이블 교차 매핑 유지
-    let weightedUp = downProb;   // UP 상태일 때 DOWN 레이블이 나오는 특성 반영
+    let weightedUp = upProb;   // UP 상태일 때 DOWN 레이블이 나오는 특성 반영
     let weightedNone = noneProb;
-    let weightedDown = upProb;   // DOWN 상태일 때 UP 레이블이 나오는 특성 반영
+    let weightedDown = downProb;   // DOWN 상태일 때 UP 레이블이 나오는 특성 반영
     
     // 3. 현재 프레임의 최대 확률 계산 (이제 딱 한 번만 수행됩니다)
     let realMaxProb = Math.max(weightedUp, weightedDown, weightedNone);
