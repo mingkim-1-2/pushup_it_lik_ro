@@ -340,9 +340,9 @@ async function predict(){
     } 
 
     // 2. 의도하신 레이블 교차 가중치 매핑 구조 유지
-    let weightedUp = downProb;   
+    let weightedUp = upProb;   
     let weightedNone = noneProb;
-    let weightedDown = upProb;   
+    let weightedDown = downProb;   
     
     // 3. 신뢰도(최대 확률) 추출 및 화면 표시 (500% 에러 해결됨)
     let realMaxProb = Math.max(weightedUp, weightedDown, weightedNone);
