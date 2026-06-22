@@ -158,6 +158,26 @@ button:hover {
     font-weight: 700;
     color: #0f172a;
 }
+
+/* 🎨 숫자가 표시되는 span 태그 스타일 */
+.confidence-num {
+    color: #0f172a;
+    font-weight: 700;
+}
+
+/* 🎨 초기화 버튼 전용 디자인 (CSS 추가됨) */
+.reset-btn {
+    width: 100%; 
+    height: 50px;
+    font-size: 16px;
+    background: #ef4444; 
+    box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4);
+}
+
+.reset-btn:hover {
+    background: #dc2626;
+    box-shadow: 0 6px 20px rgba(220, 38, 38, 0.5);
+}
 </style>
 </head>
 <body>
@@ -197,6 +217,10 @@ button:hover {
             <h2>신뢰도</h2>
             <div id="confidence">0%</div>
         </div>
+
+        <div class="btnSection" style="margin-top: 14px; text-align: center;">
+            <button onclick="resetCount()" class="reset-btn">카운트 초기화</button>
+        </div>
     </div>
 </div>
 
@@ -211,7 +235,7 @@ let count = 0;
 let tempState = "NONE";
 let stableCount = 0;
 let currentState = "NONE";
-const REQUIRED_FRAMES = 10; // 🛠️ 중요: 연속으로 몇 프레임 유지되어야 바꿀지 설정 (기본 10프레임)
+const REQUIRED_FRAMES = 10; 
 
 let cycleState = 0;
 
@@ -250,9 +274,7 @@ async function loop(){
     window.requestAnimationFrame(loop);
 }
 
-// 🛠️ 대폭 강화된 프레임 잠금 디바운싱 함수
 function updateState(newState){
-    // 들어온 가상의 신호(newState)가 직전 프레임의 가상 신호와 같다면 카운트 증가
     if(tempState === newState){
         stableCount++;
     } else {
@@ -260,12 +282,10 @@ function updateState(newState){
         stableCount = 1;
     }
 
-    // 🔒 설정한 프레임(REQUIRED_FRAMES)을 완벽하게 연속으로 채워야만 실제 결과(currentState)를 교체!
     if(stableCount >= REQUIRED_FRAMES){
         currentState = tempState;
     }
 
-    // 화면 UI 업데이트
     document.getElementById("state").innerHTML = currentState;
     if(currentState === "UP") {
         document.getElementById("result").innerHTML = "올바른 자세 (UP)";
@@ -304,7 +324,7 @@ async function predict(){
     let downProb = 0;
     let noneProb = 0;
 
-    // 1. Teachable Machine에서 클래스별 확률 수집
+    // 1. 모든 클래스의 확률 수집 (for 루프 정상 종료 확인)
     for(let i = 0; i < maxPredictions; i++){
         let className = prediction[i].className.toLowerCase();
         
@@ -317,28 +337,26 @@ async function predict(){
         else if(className === "none"){
             noneProb = prediction[i].probability;
         }
-    } // 👈 닫는 괄호를 이쪽으로 이동하여 for 루프를 여기서 끝냅니다.
+    } 
 
-    // 2. 의도하신 대로 레이블 교차 매핑 유지
-    let weightedUp = upProb;   // UP 상태일 때 DOWN 레이블이 나오는 특성 반영
+    // 2. 의도하신 레이블 교차 가중치 매핑 구조 유지
+    let weightedUp = downProb;   
     let weightedNone = noneProb;
-    let weightedDown = downProb;   // DOWN 상태일 때 UP 레이블이 나오는 특성 반영
+    let weightedDown = upProb;   
     
-    // 3. 현재 프레임의 최대 확률 계산 (이제 딱 한 번만 수행됩니다)
+    // 3. 신뢰도(최대 확률) 추출 및 화면 표시 (500% 에러 해결됨)
     let realMaxProb = Math.max(weightedUp, weightedDown, weightedNone);
-
-    // 4. 신뢰도 화면 표시 (100%를 넘지 않고 정상 출력됩니다)
     const formattedProb = (realMaxProb * 100).toFixed(1);
     document.getElementById("confidence").innerHTML = `<span class="confidence-num">${formattedProb}</span>%`;
 
-    // 5. 엄격한 조건 검증 및 상태 업데이트
+    // 4. 조건 검증 및 상태 업데이트
     if (weightedUp > 0.7 && (weightedUp - weightedDown > 0.2)) {
         updateState("UP");
     }
     else if (weightedDown > 0.7 && (weightedDown - weightedUp > 0.2)) {
         updateState("DOWN");
     }
-    else if (weightedNone > 0.4) {
+    else if (weightedNone > 0.7) {
         updateState("NONE");
     }
     else {
@@ -355,6 +373,13 @@ function drawPose(){
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(webcam.canvas, 0, 0, 720, 480);
     }
+}
+
+// ➕ 카운트 및 운동 상태를 완전히 초기화하는 함수 추가됨
+function resetCount() {
+    count = 0;
+    cycleState = 0; 
+    document.getElementById("count").innerHTML = count;
 }
 </script>
 
